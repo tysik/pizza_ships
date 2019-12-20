@@ -9,7 +9,6 @@ pub enum ShipType {
 pub struct ShipStreak {
     pub kind: ShipType,
     pub count: u32,
-    start_idx: u32,
 }
 
 impl ShipStreak {
@@ -24,16 +23,15 @@ impl ShipStreak {
         let mut current_streak = ShipStreak {
             kind: ships[0],
             count: 0,
-            start_idx: 0,
         };
-        for (idx, kind) in ships.iter().enumerate() {
+
+        for kind in ships {
             if *kind == current_streak.kind {
                 current_streak.count += 1;
             } else {
                 ship_streaks.push(current_streak.clone());
                 current_streak.kind = *kind;
                 current_streak.count = 1;
-                current_streak.start_idx = idx as u32;
             }
         }
         ship_streaks.push(current_streak);
