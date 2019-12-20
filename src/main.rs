@@ -7,7 +7,7 @@ fn main() {
     let points_for_b = 2;
     let points_for_c = 3;
     let points_limit = 5;
-    let ships_count = 3;
+    let ships_count = 12;
     let input_string = "AABBCCAABBCC";
 
     let pizza = PizzaKiller::make(
@@ -18,8 +18,6 @@ fn main() {
         ships_count,
         input_string,
     );
-
-    pizza.print();
 
     let result = pizza.evaluate();
     println!("{}", result);

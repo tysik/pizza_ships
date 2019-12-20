@@ -18,13 +18,11 @@ impl ShipStreak {
             "trying to create streaks from empty ship vector"
         );
 
-        let mut ship_streaks = Vec::new();
-
         let mut current_streak = ShipStreak {
             kind: ships[0],
             count: 0,
         };
-
+        let mut ship_streaks = Vec::new();
         for kind in ships {
             if *kind == current_streak.kind {
                 current_streak.count += 1;

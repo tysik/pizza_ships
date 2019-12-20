@@ -43,75 +43,37 @@ impl PizzaKiller {
             streak_indices,
         }
     }
+
     pub fn evaluate(&self) -> u32 {
-        self.evaluate_swapped(0)
+        self.eval(0, None)
     }
 
-    fn evaluate_continuated(&self, streak_idx: usize, continued_streak: &ShipStreak) -> u32 {
+    fn eval(&self, streak_idx: usize, continued_streak: Option<&ShipStreak>) -> u32 {
         let mut current_streak = if let Some(streak) = self.ship_streaks.get(streak_idx) {
             *streak
+        } else if let Some(prev_streak) = continued_streak {
+            return self.arbiter.evaluate_streak(prev_streak);
         } else {
-            return self.arbiter.evaluate_streak(continued_streak);
+            return 0;
         };
 
-        current_streak.merge_with(continued_streak);
+        if let Some(prev_streak) = continued_streak {
+            current_streak.merge_with(prev_streak);
+        }
 
         // SWAP
         let swap_result =
-            self.arbiter.evaluate_streak(&current_streak) + self.evaluate_swapped(streak_idx + 1);
+            self.arbiter.evaluate_streak(&current_streak) + self.eval(streak_idx + 1, None);
 
         // CONTINUE
         let next_streak_idx = self.find_next_streak_idx(streak_idx, current_streak.kind);
         let cont_result = if let Some(idx) = next_streak_idx {
-            self.evaluate_continuated(idx, &mut current_streak)
+            self.eval(idx, Some(&current_streak))
         } else {
             self.arbiter.evaluate_streak(&current_streak)
         };
 
         std::cmp::max(swap_result, cont_result)
-    }
-
-    fn evaluate_swapped(&self, streak_idx: usize) -> u32 {
-        let mut current_streak = if let Some(streak) = self.ship_streaks.get(streak_idx) {
-            streak
-        } else {
-            return 0;
-        };
-
-        // SWAP
-        let swap_result =
-            self.arbiter.evaluate_streak(current_streak) + self.evaluate_swapped(streak_idx + 1);
-
-        // CONTINUE
-        let next_streak_idx = self.find_next_streak_idx(streak_idx, current_streak.kind);
-        let cont_result = if let Some(idx) = next_streak_idx {
-            self.evaluate_continuated(idx, &mut current_streak)
-        } else {
-            self.arbiter.evaluate_streak(current_streak)
-        };
-
-        std::cmp::max(swap_result, cont_result)
-    }
-
-    pub fn print(&self) {
-        println!("{:?}", self.arbiter);
-        println!("");
-
-        for streak in self.ship_streaks.iter() {
-            println!("{:?}", streak);
-        }
-        println!("");
-
-        for (key, ref value) in self.streak_indices.iter() {
-            println!("Type {:?}: {:?}", key, value);
-        }
-        println!("");
-
-        for streak in self.ship_streaks.iter() {
-            let value = self.arbiter.evaluate_streak(&streak);
-            println!("value: {}", value);
-        }
-        println!("");
     }
 
     fn get_streak_indices(kind: ShipType, ship_streaks: &Vec<ShipStreak>) -> Vec<usize> {
@@ -121,7 +83,7 @@ impl PizzaKiller {
                 indices.push(idx);
             }
         }
-        indices //.iter().rev().cloned().collect()
+        indices
     }
 
     fn find_next_streak_idx(&self, current_idx: usize, kind: ShipType) -> Option<usize> {

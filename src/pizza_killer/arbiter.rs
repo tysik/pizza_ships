@@ -35,7 +35,7 @@ impl Arbiter {
 }
 
 impl SubArbiter {
-    pub fn evaluate_points(&self, ships_count: u32) -> u32 {
+    fn evaluate_points(&self, ships_count: u32) -> u32 {
         if ships_count > self.ships_before_limit {
             return self.points_before_limit
                 + (ships_count - self.ships_before_limit) * self.points_limit;
@@ -66,7 +66,7 @@ impl SubArbiter {
             }
             ships_count += 1;
         }
-        // Arithmetic series
+        // Use sum of arithmetic series
         let total_points = points_for_first_ship * ships_count * (ships_count + 1) / 2;
         (ships_count, total_points)
     }
