@@ -87,6 +87,7 @@ impl PizzaKiller {
     }
 
     fn find_next_streak_idx(&self, current_idx: usize, kind: ShipType) -> Option<usize> {
+        // TODO: If only we kept the most recently used idx of each kind we would not have to search for the next one every time. Also, these indices are sorted in a growing order.
         for idx in self.streak_indices[&kind].iter() {
             if *idx > current_idx {
                 return Some(*idx);
