@@ -2,7 +2,7 @@ use super::ships::*;
 use std::collections::HashMap;
 
 #[derive(Debug)]
-pub struct MainArbiter {
+pub struct Arbiter {
     sub_arbiters: HashMap<ShipType, SubArbiter>,
 }
 
@@ -14,7 +14,7 @@ pub struct SubArbiter {
     points_limit: u32,
 }
 
-impl MainArbiter {
+impl Arbiter {
     pub fn make(
         points_for_a: u32,
         points_for_b: u32,
@@ -35,7 +35,17 @@ impl MainArbiter {
 }
 
 impl SubArbiter {
-    pub fn make(points_for_first_ship: u32, points_limit: u32) -> Self {
+    pub fn evaluate_points(&self, ships_count: u32) -> u32 {
+        if ships_count > self.ships_before_limit {
+            return self.points_before_limit
+                + (ships_count - self.ships_before_limit) * self.points_limit;
+        } else {
+            // Use sum of arithmetic series
+            return self.points_for_first_ship * ships_count * (ships_count + 1) / 2;
+        }
+    }
+
+    fn make(points_for_first_ship: u32, points_limit: u32) -> Self {
         let (ships_before_limit, points_before_limit) =
             Self::count_ship_limits(points_for_first_ship, points_limit);
 
@@ -44,16 +54,6 @@ impl SubArbiter {
             ships_before_limit,
             points_before_limit,
             points_limit,
-        }
-    }
-
-    pub fn evaluate_points(&self, ships_count: u32) -> u32 {
-        if ships_count > self.ships_before_limit {
-            return self.points_before_limit
-                + (ships_count - self.ships_before_limit) * self.points_limit;
-        } else {
-            // Use sum of arithmetic series
-            return self.points_for_first_ship * ships_count * (ships_count + 1) / 2;
         }
     }
 

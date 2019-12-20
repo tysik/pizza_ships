@@ -9,13 +9,7 @@ pub enum ShipType {
 pub struct ShipStreak {
     pub kind: ShipType,
     pub count: u32,
-    start_idx: u32,    
-}
-
-#[derive(Debug)]
-pub struct OneKindShipStreaks {
-    kind: ShipType,
-    indices: Vec<u32>,
+    start_idx: u32,
 }
 
 impl ShipStreak {
@@ -45,18 +39,13 @@ impl ShipStreak {
         ship_streaks.push(current_streak);
         ship_streaks
     }
-}
 
-impl OneKindShipStreaks {
-    pub fn make(kind: ShipType, ship_streaks: &Vec<ShipStreak>) -> Self {
-        let mut indices = Vec::new();
-        for streak in ship_streaks {
-            if streak.kind == kind {
-                indices.push(streak.start_idx);
-            }
-        }
-
-        Self { indices, kind }
+    pub fn merge_with(&mut self, another_streak: &ShipStreak) {
+        assert!(
+            self.kind == another_streak.kind,
+            "trying to merge streaks of different kinds"
+        );
+        self.count += another_streak.count;
     }
 }
 
